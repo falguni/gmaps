@@ -33,7 +33,7 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.ACCESS_NETWORK_STATE;
 import static android.Manifest.permission.INTERNET;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback /*, LocationListener*/ {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
 
     GoogleMap gMap;
     GoogleMap.OnCameraIdleListener onCameraIdleListener;
@@ -157,22 +157,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        gMap.setMyLocationEnabled(true);
-        Location myLocation = gMap.getMyLocation();
-        latitude = myLocation.getLatitude();
-        longitude = myLocation.getLongitude();
-        LatLng currentLocation = new LatLng(latitude, longitude);
+        gMap.setMyLocationEnabled(true);*/
+
+        Location myLocation = getCurrentLocation();
+        LatLng currentLocation = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
         gMap.addMarker(new MarkerOptions().position(currentLocation).title("Your Current Location").draggable(true));
-        gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 12.0f));*/
+        gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 12.0f));
 
         //mMap.setOnCameraIdleListener(onCameraIdleListener);
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
+        /*LatLng sydney = new LatLng(-34, 151);
         gMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney").draggable(true));
-        gMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        gMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));*/
     }
 
-    public Location getLocation() {
+    public Location getCurrentLocation() {
         Location currentLocation = new Location("Current Location");
         try {
             if (!checkPermission()) {
@@ -200,8 +199,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (isNetworkEnabled) {
                     currentLocation=null;
                     locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-                            MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, (LocationListener) this);
-                    Log.d("Network", "Network");
+                            MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
                     if (locationManager != null) {
                         currentLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                         if (currentLocation != null) {
@@ -215,8 +213,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     currentLocation=null;
                     if (currentLocation == null) {
                         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                                MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, (LocationListener) this);
-                        Log.d("GPS Enabled", "GPS Enabled");
+                                MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                        currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                         if (locationManager != null) {
                             currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                             //currentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
@@ -240,5 +238,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 + ") VALUES (" + "'" + locationName + "'" + ", '" + locationCategory + "'" + ", '"
                 + latitude + "'" + ", '" + longitude + "'" + ")";
         db.executeInsertQuery(query_logs);
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String s) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
+
     }
 }
